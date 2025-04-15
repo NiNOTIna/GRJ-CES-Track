@@ -172,21 +172,12 @@ export default function Home() {
     <div className="container mx-auto p-4">
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>CES Points</CardTitle>
-          <CardDescription>Your accumulated Community Engagement Service points.</CardDescription>
+          <CardTitle>CES Points &amp; Progress</CardTitle>
+          <CardDescription>Your accumulated Community Engagement Service points and progress towards graduation.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{cesPoints} Points</div>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Progress Tracker</CardTitle>
-          <CardDescription>Track your progress towards graduation requirements.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Progress value={progress} />
+          <Progress value={progress} className="mt-4" />
           <div className="text-sm mt-2">{cesPoints} / {CES_POINTS_REQUIRED} Points</div>
         </CardContent>
         <CardHeader>
