@@ -54,11 +54,6 @@ const serviceOptions = [
   { value: "co", label: "Co Curricular", points: 3 },
 ];
 
-const componentBOptions = [
-  { value: "option1", label: "Option 1", points: 2 },
-  { value: "option2", label: "Option 2", points: 3 },
-  { value: "option3", label: "Option 3", points: 5 },
-];
 
 // Define types for selected options
 type RoleValue = "member" | "speaker" | "leader";
@@ -66,7 +61,6 @@ type RecipientValue = "communities" | "organizations" | "institutions" | "others
 type ApproachValue = "transformatory" | "project" | "conference" | "welfare";
 type ScopeValue = "university" | "school" | "departmental" | "personal";
 type ServiceValue = "extra" | "co";
-type ComponentBValue = "option1" | "option2" | "option3";
 
 interface PointsMatrixState {
   role: RoleValue;
@@ -74,7 +68,7 @@ interface PointsMatrixState {
   approach: ApproachValue;
   scope: ScopeValue;
   service: ServiceValue;
-  componentB: ComponentBValue;
+  hours: number;
 }
 
 const initialPointsMatrixState: PointsMatrixState = {
@@ -83,7 +77,7 @@ const initialPointsMatrixState: PointsMatrixState = {
   approach: "transformatory",
   scope: "university",
   service: "extra",
-  componentB: "option1",
+  hours: 0,
 };
 
 
@@ -125,15 +119,20 @@ export default function Home() {
     const approachPoints = approachOptions.find((option) => option.value === pointsMatrix.approach)?.points || 0;
     const scopePoints = scopeOptions.find((option) => option.value === pointsMatrix.scope)?.points || 0;
     const servicePoints = serviceOptions.find((option) => option.value === pointsMatrix.service)?.points || 0;
-    const componentBPoints = componentBOptions.find((option) => option.value === pointsMatrix.componentB)?.points || 0;
 
-    return rolePoints + recipientPoints + approachPoints + scopePoints + servicePoints + componentBPoints;
+    return rolePoints + recipientPoints + approachPoints + scopePoints + servicePoints + pointsMatrix.hours;
   };
 
   const totalPoints = calculateTotalPoints();
 
   const handlePointsMatrixChange = (key: keyof PointsMatrixState, value: string) => {
-    setPointsMatrix((prev) => ({ ...prev, [key]: value }));
+    if (key === "hours") {
+      // Parse the value as a number when it's the "hours" field
+      setPointsMatrix((prev) => ({ ...prev, [key]: parseInt(value, 10) || 0 }));
+    } else {
+      // Otherwise, treat it as a string
+      setPointsMatrix((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
 
@@ -295,19 +294,13 @@ export default function Home() {
           </div>
 
           <div>
-            <Label htmlFor="componentB">Component B</Label>
-            <Select onValueChange={(value) => handlePointsMatrixChange("componentB", value)}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select Component B" currentValue={pointsMatrix.componentB} />
-              </SelectTrigger>
-              <SelectContent>
-                {componentBOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="hours">Hours</Label>
+            <Input
+              type="number"
+              id="hours"
+              value={pointsMatrix.hours}
+              onChange={(e) => handlePointsMatrixChange("hours", e.target.value)}
+            />
           </div>
 
           <div className="mt-2">
