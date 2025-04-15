@@ -226,7 +226,6 @@ export default function Home() {
                     mode="single"
                     selected={selectedDate}
                     onSelect={setSelectedDate}
-                    disabled={{ before: new Date() }}
                     initialFocus
                   />
                 </PopoverContent>
