@@ -111,6 +111,7 @@ export default function Home() {
       withWhatIExperiencedIWill,
       iFeltThat,
       iThoughtThat,
+      overallRating,
     });
     // Reset form fields after submission
     setActivityName("");
@@ -123,6 +124,7 @@ export default function Home() {
     setWithWhatIExperiencedIWill("");
     setIFeltThat("");
     setIThoughtThat("");
+    setOverallRating("");
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -166,6 +168,7 @@ export default function Home() {
   const [iFeltThat, setIFeltThat] = useState("");
   const [role, setRole] = useState("");
   const [iThoughtThat, setIThoughtThat] = useState("");
+  const [overallRating, setOverallRating] = useState("");
 
   const { toast } = useToast();
 
@@ -285,14 +288,6 @@ export default function Home() {
                 onChange={(e) => setISawThat(e.target.value)}
               />
             </div>
-            <div>
-              <Label htmlFor="iThoughtThat">The exposure activity made me think that...</Label>
-              <Textarea
-                id="iThoughtThat"
-                value={iThoughtThat}
-                onChange={(e) => setIThoughtThat(e.target.value)}
-              />
-            </div>
 
             <div>
               <Label htmlFor="iHeardThat">I heard that...</Label>
@@ -313,12 +308,37 @@ export default function Home() {
             </div>
 
             <div>
+              <Label htmlFor="iThoughtThat">The exposure activity made me think that...</Label>
+              <Textarea
+                id="iThoughtThat"
+                value={iThoughtThat}
+                onChange={(e) => setIThoughtThat(e.target.value)}
+              />
+            </div>
+
+            <div>
               <Label htmlFor="iFeltThat">I felt that...</Label>
               <Textarea
                 id="iFeltThat"
                 value={iFeltThat}
                 onChange={(e) => setIFeltThat(e.target.value)}
               />
+            </div>
+
+            <div>
+              <Label htmlFor="overallRating">What is your overall rating to the CES Exposure Activity?</Label>
+              <Select onValueChange={(value) => setOverallRating(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select rating" currentValue={overallRating} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Angry">Angry</SelectItem>
+                  <SelectItem value="Disappointed">Disappointed</SelectItem>
+                  <SelectItem value="Neutral">Neutral</SelectItem>
+                  <SelectItem value="Good">Good</SelectItem>
+                  <SelectItem value="Love">Love</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <Button onClick={handleActivitySubmit} className="bg-teal-500 text-white hover:bg-teal-700">
@@ -432,3 +452,4 @@ export default function Home() {
     </div>
   );
 }
+
