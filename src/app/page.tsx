@@ -120,7 +120,7 @@ export default function Home() {
     const scopePoints = scopeOptions.find((option) => option.value === pointsMatrix.scope)?.points || 0;
     const servicePoints = serviceOptions.find((option) => option.value === pointsMatrix.service)?.points || 0;
 
-    return rolePoints + recipientPoints + approachPoints + scopePoints + servicePoints + pointsMatrix.hours;
+    return ((rolePoints + recipientPoints + approachPoints + scopePoints + servicePoints)/2 + pointsMatrix.hours/2);
   };
 
   const totalPoints = calculateTotalPoints();
