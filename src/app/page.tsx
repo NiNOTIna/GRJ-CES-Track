@@ -213,6 +213,7 @@ export default function Home() {
                   onChange={(e) => setTitleOfActivity(e.target.value)}
                 />
               </div>
+
               <div>
                 <Label htmlFor="date">Date of Activity</Label>
                 <Popover>
@@ -238,6 +239,22 @@ export default function Home() {
                   </PopoverContent>
                 </Popover>
               </div>
+            </div>
+
+            <div>
+              <Label htmlFor="role">Role</Label>
+              <Select onValueChange={(value) => handlePointsMatrixChange("role", value)}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
