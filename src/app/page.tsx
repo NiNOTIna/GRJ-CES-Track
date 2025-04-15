@@ -205,16 +205,6 @@ export default function Home() {
           <CardContent className="grid gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="titleOfActivity">Name of Activity</Label>
-                <Input
-                  type="text"
-                  id="titleOfActivity"
-                  value={titleOfActivity}
-                  onChange={(e) => setTitleOfActivity(e.target.value)}
-                />
-              </div>
-
-              <div>
                 <Label htmlFor="date">Date of Activity</Label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -239,22 +229,25 @@ export default function Home() {
                   </PopoverContent>
                 </Popover>
               </div>
+
+              <div>
+                <Label htmlFor="titleOfActivity">Name of Activity</Label>
+                <Input
+                  type="text"
+                  id="titleOfActivity"
+                  value={titleOfActivity}
+                  onChange={(e) => setTitleOfActivity(e.target.value)}
+                />
+              </div>
             </div>
 
             <div>
               <Label htmlFor="role">Role</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("role", value)}>
-                <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
-                </SelectTrigger>
-                <SelectContent>
-                  {roleOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                  type="text"
+                  id="role"
+                  placeholder="Enter your role in this activity"
+                />
             </div>
 
             <div>
