@@ -110,6 +110,7 @@ export default function Home() {
       iHeardThat,
       withWhatIExperiencedIWill,
       iFeltThat,
+      iThoughtThat,
     });
     // Reset form fields after submission
     setActivityName("");
@@ -121,6 +122,7 @@ export default function Home() {
     setIHeardThat("");
     setWithWhatIExperiencedIWill("");
     setIFeltThat("");
+    setIThoughtThat("");
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -163,6 +165,7 @@ export default function Home() {
   const [withWhatIExperiencedIWill, setWithWhatIExperiencedIWill] = useState("");
   const [iFeltThat, setIFeltThat] = useState("");
   const [role, setRole] = useState("");
+  const [iThoughtThat, setIThoughtThat] = useState("");
 
   const { toast } = useToast();
 
@@ -244,11 +247,10 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="role">Role</Label>
+                    <Label htmlFor="role">Role in Activity</Label>
                     <Input
                         type="text"
                         id="role"
-                        placeholder="Enter your role in this activity"
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
                     />
@@ -281,6 +283,14 @@ export default function Home() {
                 id="iSawThat"
                 value={iSawThat}
                 onChange={(e) => setISawThat(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="iThoughtThat">The exposure activity made me think that...</Label>
+              <Textarea
+                id="iThoughtThat"
+                value={iThoughtThat}
+                onChange={(e) => setIThoughtThat(e.target.value)}
               />
             </div>
 
