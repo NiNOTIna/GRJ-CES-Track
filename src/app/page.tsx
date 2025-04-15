@@ -17,12 +17,9 @@ import { useToast } from "@/hooks/use-toast";
 
 const CES_POINTS_REQUIRED = 60;
 
-const activityPoints = {
-  "Volunteering at a local shelter": 5,
-  "Participating in a community cleanup": 3,
-  "Tutoring younger students": 7,
-  "Assisting at a food bank": 4,
-  "Mentoring underprivileged youth": 6,
+const activityPoints = 
+{
+
 };
 
 type ActivityType = keyof typeof activityPoints;
@@ -199,216 +196,214 @@ export default function Home() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Submit Activity</CardTitle>
-          <CardDescription>Enter details about your community service activity.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="date">Specify Date of Activity</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center" side="bottom">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+      <div className="md:grid md:grid-cols-2 md:gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Submit Activity</CardTitle>
+            <CardDescription>Enter details about your community service activity.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="date">Date of Activity</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center" side="bottom">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <Label htmlFor="titleOfActivity">Name of Activity</Label>
+                <Input
+                  type="text"
+                  id="titleOfActivity"
+                  value={titleOfActivity}
+                  onChange={(e) => setTitleOfActivity(e.target.value)}
+                />
+              </div>
             </div>
+
             <div>
-              <Label htmlFor="titleOfActivity">Title of Activity</Label>
+              <Label htmlFor="proofUpload">Upload Documentation</Label>
               <Input
-                type="text"
-                id="titleOfActivity"
-                value={titleOfActivity}
-                onChange={(e) => setTitleOfActivity(e.target.value)}
+                type="file"
+                id="proofUpload"
+                multiple
+                onChange={handleFileChange}
+              />
+              {proofFiles.length > 0 && (
+                <div className="mt-2">
+                  <p>Uploaded files:</p>
+                  <ul>
+                    {proofFiles.map((file, index) => (
+                      <li key={index}>{file.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="iSawThat">I saw that...</Label>
+              <Textarea
+                id="iSawThat"
+                value={iSawThat}
+                onChange={(e) => setISawThat(e.target.value)}
               />
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="proofUpload">Add Image for Verification</Label>
-            <Input
-              type="file"
-              id="proofUpload"
-              multiple
-              onChange={handleFileChange}
-            />
-            {proofFiles.length > 0 && (
-              <div className="mt-2">
-                <p>Uploaded files:</p>
-                <ul>
-                  {proofFiles.map((file, index) => (
-                    <li key={index}>{file.name}</li>
+            <div>
+              <Label htmlFor="iHeardThat">I heard that...</Label>
+              <Textarea
+                id="iHeardThat"
+                value={iHeardThat}
+                onChange={(e) => setIHeardThat(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="withWhatIExperiencedIWill">With what I experienced, I will...</Label>
+              <Textarea
+                id="withWhatIExperiencedIWill"
+                value={withWhatIExperiencedIWill}
+                onChange={(e) => setWithWhatIExperiencedIWill(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="iFeltThat">I felt that...</Label>
+              <Textarea
+                id="iFeltThat"
+                value={iFeltThat}
+                onChange={(e) => setIFeltThat(e.target.value)}
+              />
+            </div>
+
+            <Button onClick={handleActivitySubmit} className="bg-teal-500 text-white hover:bg-teal-700">
+              Submit Activity
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-4 md:mt-0">
+          <CardHeader>
+            <CardTitle>CES Points Calculator</CardTitle>
+            <CardDescription>Select the options that best describe your activity.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div>
+              <Label htmlFor="role">Role</Label>
+              <Select onValueChange={(value) => handlePointsMatrixChange("role", value)}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
                   ))}
-                </ul>
-              </div>
-            )}
-          </div>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label htmlFor="iSawThat">I saw that...</Label>
-            <Textarea
-              id="iSawThat"
-              placeholder="What did you observe during the activity?"
-              value={iSawThat}
-              onChange={(e) => setISawThat(e.target.value)}
-            />
-          </div>
+            <div>
+              <Label htmlFor="recipient">Recipient</Label>
+              <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select recipient" currentValue={pointsMatrix.recipient} />
+                </SelectTrigger>
+                <SelectContent>
+                  {recipientOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label htmlFor="iHeardThat">I heard that...</Label>
-            <Textarea
-              id="iHeardThat"
-              placeholder="What did you hear during the activity?"
-              value={iHeardThat}
-              onChange={(e) => setIHeardThat(e.target.value)}
-            />
-          </div>
+            <div>
+              <Label htmlFor="approach">Approach</Label>
+              <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select approach" currentValue={pointsMatrix.approach} />
+                </SelectTrigger>
+                <SelectContent>
+                  {approachOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label htmlFor="withWhatIExperiencedIWill">With what I experienced, I will...</Label>
-            <Textarea
-              id="withWhatIExperiencedIWill"
-              placeholder="How will you apply what you experienced?"
-              value={withWhatIExperiencedIWill}
-              onChange={(e) => setWithWhatIExperiencedIWill(e.target.value)}
-            />
-          </div>
+            <div>
+              <Label htmlFor="scope">Scope</Label>
+              <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select scope" currentValue={pointsMatrix.scope} />
+                </SelectTrigger>
+                <SelectContent>
+                  {scopeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label htmlFor="iFeltThat">I felt that...</Label>
-            <Textarea
-              id="iFeltThat"
-              placeholder="What emotions did you feel during the activity?"
-              value={iFeltThat}
-              onChange={(e) => setIFeltThat(e.target.value)}
-            />
-          </div>
+            <div>
+              <Label htmlFor="service">Nature of Service</Label>
+              <Select onValueChange={(value) => handlePointsMatrixChange("service", value)}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select nature of service" currentValue={pointsMatrix.service} />
+                </SelectTrigger>
+                <SelectContent>
+                  {serviceOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <Button onClick={handleActivitySubmit} className="bg-teal-500 text-white hover:bg-teal-700">
-            Submit Activity
-          </Button>
-        </CardContent>
-      </Card>
+            <div>
+              <Label htmlFor="hours">Hours</Label>
+              <Input
+                type="number"
+                id="hours"
+                value={pointsMatrix.hours}
+                onChange={(e) => handlePointsMatrixChange("hours", e.target.value)}
+              />
+            </div>
 
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>Points Matrix</CardTitle>
-          <CardDescription>Select the options that best describe your activity.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div>
-            <Label htmlFor="role">Role</Label>
-            <Select onValueChange={(value) => handlePointsMatrixChange("role", value)}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
-              </SelectTrigger>
-              <SelectContent>
-                {roleOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="recipient">Recipient</Label>
-            <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select recipient" currentValue={pointsMatrix.recipient} />
-              </SelectTrigger>
-              <SelectContent>
-                {recipientOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="approach">Approach</Label>
-            <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select approach" currentValue={pointsMatrix.approach} />
-              </SelectTrigger>
-              <SelectContent>
-                {approachOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="scope">Scope</Label>
-            <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select scope" currentValue={pointsMatrix.scope} />
-              </SelectTrigger>
-              <SelectContent>
-                {scopeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="service">Nature of Service</Label>
-            <Select onValueChange={(value) => handlePointsMatrixChange("service", value)}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select nature of service" currentValue={pointsMatrix.service} />
-              </SelectTrigger>
-              <SelectContent>
-                {serviceOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="hours">Hours</Label>
-            <Input
-              type="number"
-              id="hours"
-              value={pointsMatrix.hours}
-              onChange={(e) => handlePointsMatrixChange("hours", e.target.value)}
-            />
-          </div>
-
-          <div className="mt-2">
-            Total points for this activity: {totalPoints}
-          </div>
-        </CardContent>
-      </Card>
+            <div className="mt-2">
+              Total points for this activity: {totalPoints}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
