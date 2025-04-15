@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -22,12 +21,72 @@ const activityPoints = {
 
 type ActivityType = keyof typeof activityPoints;
 
+// Points Matrix Data
+const roleOptions = [
+  { value: "member", label: "Member/Assistant Volunteer", points: 3 },
+  { value: "speaker", label: "Speaker/Facilitator", points: 5 },
+  { value: "leader", label: "Leader/Coordinator", points: 7 },
+];
+
+const recipientOptions = [
+  { value: "communities", label: "Communities", points: 4 },
+  { value: "organizations", label: "Organizations", points: 3 },
+  { value: "institutions", label: "Institutions", points: 2 },
+  { value: "others", label: "Others", points: 1 },
+];
+
+const approachOptions = [
+  { value: "transformatory", label: "Transformatory", points: 4 },
+  { value: "project", label: "Project Development", points: 3 },
+  { value: "conference", label: "Conference/Lecture/Webinar/Tutorial", points: 2 },
+  { value: "welfare", label: "Welfare/Wellbeing", points: 1 },
+];
+
+const scopeOptions = [
+  { value: "university", label: "University Wide", points: 4 },
+  { value: "school", label: "School/InterDept", points: 3 },
+  { value: "departmental", label: "Departmental", points: 2 },
+  { value: "personal", label: "Personal", points: 1 },
+];
+
+const serviceOptions = [
+  { value: "extra", label: "Extra Curricular", points: 4 },
+  { value: "co", label: "Co Curricular", points: 3 },
+];
+
+// Define types for selected options
+type RoleValue = "member" | "speaker" | "leader";
+type RecipientValue = "communities" | "organizations" | "institutions" | "others";
+type ApproachValue = "transformatory" | "project" | "conference" | "welfare";
+type ScopeValue = "university" | "school" | "departmental" | "personal";
+type ServiceValue = "extra" | "co";
+
+interface PointsMatrixState {
+  role: RoleValue;
+  recipient: RecipientValue;
+  approach: ApproachValue;
+  scope: ScopeValue;
+  service: ServiceValue;
+}
+
+const initialPointsMatrixState: PointsMatrixState = {
+  role: "member",
+  recipient: "communities",
+  approach: "transformatory",
+  scope: "university",
+  service: "extra",
+};
+
+
 export default function Home() {
   const [cesPoints, setCesPoints] = useState(10);
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
   const [proofFiles, setProofFiles] = useState<File[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<ActivityType>("Volunteering at a local shelter");
+
+  // Points Matrix State
+  const [pointsMatrix, setPointsMatrix] = useState<PointsMatrixState>(initialPointsMatrixState);
 
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
@@ -49,6 +108,24 @@ export default function Home() {
       setProofFiles(Array.from(e.target.files));
     }
   };
+
+
+  const calculateTotalPoints = () => {
+    const rolePoints = roleOptions.find((option) => option.value === pointsMatrix.role)?.points || 0;
+    const recipientPoints = recipientOptions.find((option) => option.value === pointsMatrix.recipient)?.points || 0;
+    const approachPoints = approachOptions.find((option) => option.value === pointsMatrix.approach)?.points || 0;
+    const scopePoints = scopeOptions.find((option) => option.value === pointsMatrix.scope)?.points || 0;
+    const servicePoints = serviceOptions.find((option) => option.value === pointsMatrix.service)?.points || 0;
+
+    return rolePoints + recipientPoints + approachPoints + scopePoints + servicePoints;
+  };
+
+  const totalPoints = calculateTotalPoints();
+
+  const handlePointsMatrixChange = (key: keyof PointsMatrixState, value: string) => {
+    setPointsMatrix((prev) => ({ ...prev, [key]: value }));
+  };
+
 
   return (
     <div className="container mx-auto p-4">
@@ -121,26 +198,94 @@ export default function Home() {
         </CardContent>
       </Card>
 
-       <Card className="mt-4">
+      <Card className="mt-4">
         <CardHeader>
           <CardTitle>Points Matrix</CardTitle>
-          <CardDescription>View points earned for different activities.</CardDescription>
+          <CardDescription>Select the options that best describe your activity.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Select onValueChange={(value) => setSelectedActivity(value as ActivityType)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select activity" currentValue={selectedActivity} />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.keys(activityPoints).map((activity) => (
-                <SelectItem key={activity} value={activity}>
-                  {activity}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <CardContent className="grid gap-4">
+          <div>
+            <Label htmlFor="role">Role</Label>
+            <Select onValueChange={(value) => handlePointsMatrixChange("role", value)}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
+              </SelectTrigger>
+              <SelectContent>
+                {roleOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="recipient">Recipient</Label>
+            <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select recipient" currentValue={pointsMatrix.recipient} />
+              </SelectTrigger>
+              <SelectContent>
+                {recipientOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="approach">Approach</Label>
+            <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select approach" currentValue={pointsMatrix.approach} />
+              </SelectTrigger>
+              <SelectContent>
+                {approachOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="scope">Scope</Label>
+            <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select scope" currentValue={pointsMatrix.scope} />
+              </SelectTrigger>
+              <SelectContent>
+                {scopeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="service">Nature of Service</Label>
+            <Select onValueChange={(value) => handlePointsMatrixChange("service", value)}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select nature of service" currentValue={pointsMatrix.service} />
+              </SelectTrigger>
+              <SelectContent>
+                {serviceOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="mt-2">
-            Points earned: {activityPoints[selectedActivity]}
+            Total points for this activity: {totalPoints}
           </div>
         </CardContent>
       </Card>
