@@ -172,7 +172,7 @@ export default function Home() {
     <div className="container mx-auto p-4">
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>CES Points &amp; Progress</CardTitle>
+          <CardTitle>CES Points Progress</CardTitle>
           <CardDescription>Your accumulated Community Engagement Service points and progress towards graduation.</CardDescription>
         </CardHeader>
         <CardContent>
