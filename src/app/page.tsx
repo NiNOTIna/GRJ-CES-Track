@@ -8,15 +8,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Icons } from "@/components/icons";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CES_POINTS_REQUIRED = 20;
+
+const activityPoints = {
+  "Volunteering at a local shelter": 5,
+  "Participating in a community cleanup": 3,
+  "Tutoring younger students": 7,
+  "Assisting at a food bank": 4,
+  "Mentoring underprivileged youth": 6,
+};
+
+type ActivityType = keyof typeof activityPoints;
 
 export default function Home() {
   const [cesPoints, setCesPoints] = useState(10);
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
   const [proofFiles, setProofFiles] = useState<File[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<ActivityType>("Volunteering at a local shelter");
 
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
@@ -116,28 +127,21 @@ export default function Home() {
           <CardDescription>View points earned for different activities.</CardDescription>
         </CardHeader>
         <CardContent>
-          <table className="table-auto w-full">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">Activity</th>
-                <th className="px-4 py-2">Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border px-4 py-2">Volunteering at a local shelter</td>
-                <td className="border px-4 py-2">5</td>
-              </tr>
-              <tr>
-                <td className="border px-4 py-2">Participating in a community cleanup</td>
-                <td className="border px-4 py-2">3</td>
-              </tr>
-              <tr>
-                <td className="border px-4 py-2">Tutoring younger students</td>
-                <td className="border px-4 py-2">7</td>
-              </tr>
-            </tbody>
-          </table>
+          <Select onValueChange={(value) => setSelectedActivity(value as ActivityType)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select activity" currentValue={selectedActivity} />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(activityPoints).map((activity) => (
+                <SelectItem key={activity} value={activity}>
+                  {activity}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="mt-2">
+            Points earned: {activityPoints[selectedActivity]}
+          </div>
         </CardContent>
       </Card>
     </div>
