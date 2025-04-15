@@ -211,6 +211,15 @@ export default function Home() {
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <Label htmlFor="titleOfActivity">Name of Activity</Label>
+                    <Input
+                        type="text"
+                        id="titleOfActivity"
+                        value={titleOfActivity}
+                        onChange={(e) => setTitleOfActivity(e.target.value)}
+                    />
+                </div>
               <div>
                 <Label htmlFor="date">Date of Activity</Label>
                 <Popover>
@@ -235,16 +244,6 @@ export default function Home() {
                     />
                   </PopoverContent>
                 </Popover>
-              </div>
-
-              <div>
-                <Label htmlFor="titleOfActivity">Name of Activity</Label>
-                <Input
-                  type="text"
-                  id="titleOfActivity"
-                  value={titleOfActivity}
-                  onChange={(e) => setTitleOfActivity(e.target.value)}
-                />
               </div>
             </div>
 
@@ -452,4 +451,5 @@ export default function Home() {
     </div>
   );
 }
+
 
