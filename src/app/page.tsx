@@ -8,6 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 const CES_POINTS_REQUIRED = 20;
 
@@ -99,11 +105,27 @@ export default function Home() {
       activityName,
       activityDescription,
       proofFiles,
+      selectedDate, // Include selectedDate in the submission
+      titleOfActivity,
+      iSawThat,
+      iHeardThat,
+      withWhatIExperiencedIWill,
+      iFeltThat,
     });
     // Reset form fields after submission
     setActivityName("");
     setActivityDescription("");
     setProofFiles([]);
+    setSelectedDate(undefined);
+    setTitleOfActivity("");
+    setISawThat("");
+    setIHeardThat("");
+    setWithWhatIExperiencedIWill("");
+    setIFeltThat("");
+    toast({
+      title: "Activity submitted!",
+      description: "Your activity has been submitted for review.",
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +157,14 @@ export default function Home() {
     }
   };
 
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [titleOfActivity, setTitleOfActivity] = useState("");
+  const [iSawThat, setISawThat] = useState("");
+  const [iHeardThat, setIHeardThat] = useState("");
+  const [withWhatIExperiencedIWill, setWithWhatIExperiencedIWill] = useState("");
+  const [iFeltThat, setIFeltThat] = useState("");
+
+  const { toast } = useToast();
 
   return (
     <div className="container mx-auto p-4">
@@ -165,25 +195,46 @@ export default function Home() {
           <CardDescription>Enter details about your community service activity.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div>
-            <Label htmlFor="activityName">Activity Name</Label>
-            <Input
-              type="text"
-              id="activityName"
-              value={activityName}
-              onChange={(e) => setActivityName(e.target.value)}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="date">Specify Date of Activity</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center" side="bottom">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    disabled={{ before: new Date() }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
+              <Label htmlFor="titleOfActivity">Title of Activity</Label>
+              <Input
+                type="text"
+                id="titleOfActivity"
+                value={titleOfActivity}
+                onChange={(e) => setTitleOfActivity(e.target.value)}
+              />
+            </div>
           </div>
+
           <div>
-            <Label htmlFor="activityDescription">Activity Description</Label>
-            <Textarea
-              id="activityDescription"
-              value={activityDescription}
-              onChange={(e) => setActivityDescription(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="proofUpload">Upload Proof</Label>
+            <Label htmlFor="proofUpload">Add Image for Verification</Label>
             <Input
               type="file"
               id="proofUpload"
@@ -201,6 +252,47 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          <div>
+            <Label htmlFor="iSawThat">I saw that...</Label>
+            <Textarea
+              id="iSawThat"
+              placeholder="What did you observe during the activity?"
+              value={iSawThat}
+              onChange={(e) => setISawThat(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="iHeardThat">I heard that...</Label>
+            <Textarea
+              id="iHeardThat"
+              placeholder="What did you hear during the activity?"
+              value={iHeardThat}
+              onChange={(e) => setIHeardThat(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="withWhatIExperiencedIWill">With what I experienced, I will...</Label>
+            <Textarea
+              id="withWhatIExperiencedIWill"
+              placeholder="How will you apply what you experienced?"
+              value={withWhatIExperiencedIWill}
+              onChange={(e) => setWithWhatIExperiencedIWill(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="iFeltThat">I felt that...</Label>
+            <Textarea
+              id="iFeltThat"
+              placeholder="What emotions did you feel during the activity?"
+              value={iFeltThat}
+              onChange={(e) => setIFeltThat(e.target.value)}
+            />
+          </div>
+
           <Button onClick={handleActivitySubmit} className="bg-teal-500 text-white hover:bg-teal-700">
             Submit Activity
           </Button>
