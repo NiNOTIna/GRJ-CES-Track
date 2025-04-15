@@ -162,6 +162,7 @@ export default function Home() {
   const [iHeardThat, setIHeardThat] = useState("");
   const [withWhatIExperiencedIWill, setWithWhatIExperiencedIWill] = useState("");
   const [iFeltThat, setIFeltThat] = useState("");
+  const [role, setRole] = useState("");
 
   const { toast } = useToast();
 
@@ -241,23 +242,28 @@ export default function Home() {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="role">Role</Label>
-              <Input
-                  type="text"
-                  id="role"
-                  placeholder="Enter your role in this activity"
-                />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <Label htmlFor="role">Role</Label>
+                    <Input
+                        type="text"
+                        id="role"
+                        placeholder="Enter your role in this activity"
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                    />
+                </div>
 
-            <div>
-              <Label htmlFor="proofUpload">Upload Documentation</Label>
-              <Input
-                type="file"
-                id="proofUpload"
-                multiple
-                onChange={handleFileChange}
-              />
+                <div>
+                    <Label htmlFor="proofUpload">Upload Documentation</Label>
+                    <Input
+                        type="file"
+                        id="proofUpload"
+                        multiple
+                        onChange={handleFileChange}
+                    />
+                </div>
+            </div>
               {proofFiles.length > 0 && (
                 <div className="mt-2">
                   <p>Uploaded files:</p>
@@ -268,7 +274,6 @@ export default function Home() {
                   </ul>
                 </div>
               )}
-            </div>
 
             <div>
               <Label htmlFor="iSawThat">I saw that...</Label>
