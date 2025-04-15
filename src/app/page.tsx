@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
-const CES_POINTS_REQUIRED = 20;
+const CES_POINTS_REQUIRED = 60;
 
 const activityPoints = {
   "Volunteering at a local shelter": 5,
@@ -93,10 +93,12 @@ export default function Home() {
   const [activityDescription, setActivityDescription] = useState("");
   const [proofFiles, setProofFiles] = useState<File[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<ActivityType>("Volunteering at a local shelter");
+  const [disciplinePoints, setDisciplinePoints] = useState(5);
 
   // Points Matrix State
   const [pointsMatrix, setPointsMatrix] = useState<PointsMatrixState>(initialPointsMatrixState);
 
+  const nonDisciplinePoints = cesPoints - disciplinePoints;
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
   const handleActivitySubmit = () => {
@@ -186,6 +188,23 @@ export default function Home() {
         <CardContent>
           <Progress value={progress} />
           <div className="text-sm mt-2">{cesPoints} / {CES_POINTS_REQUIRED} Points</div>
+        </CardContent>
+        <CardHeader>
+          <CardTitle>Points Breakdown</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+            <div className="flex items-center space-x-2">
+                <div>Non Discipline pts</div>
+                <div>{nonDisciplinePoints} / {CES_POINTS_REQUIRED * 0.3}</div>
+            </div>
+            <div className="flex items-center space-x-2">
+                <div>Discipline Pts</div>
+                <div>{disciplinePoints} pts</div>
+            </div>
+            <div className="flex items-center space-x-2">
+                <div>Total Points</div>
+                <div>{cesPoints} / {CES_POINTS_REQUIRED}</div>
+            </div>
         </CardContent>
       </Card>
 
