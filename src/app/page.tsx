@@ -177,7 +177,7 @@ export default function Home() {
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>CES Points Progress</CardTitle>
-          <CardDescription>Your accumulated Community Engagement Service points and progress towards graduation.</CardDescription>
+          <CardDescription>This tracker is not affiliated with the USC CES Office. The records of the University will always be used over what is recorded on this tracker.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{cesPoints} Points</div>
@@ -190,7 +190,7 @@ export default function Home() {
         <CardContent className="grid gap-4">
             <div className="flex items-center space-x-2">
                 <div>Non Discipline pts</div>
-                <div>{nonDisciplinePoints} / {CES_POINTS_REQUIRED * 0.3}</div>
+                <div>{nonDisciplinePoints} / 18</div>
             </div>
             <div className="flex items-center space-x-2">
                 <div>Discipline Pts</div>
@@ -207,7 +207,7 @@ export default function Home() {
         <Card>
           <CardHeader>
             <CardTitle>Submit Activity</CardTitle>
-            <CardDescription>Enter details about your community service activity.</CardDescription>
+            <CardDescription>Keep a record of your participation.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -349,7 +349,7 @@ export default function Home() {
         <Card className="mt-4 md:mt-0">
           <CardHeader>
             <CardTitle>CES Points Calculator</CardTitle>
-            <CardDescription>Select the options that best describe your activity.</CardDescription>
+            <CardDescription>See how many CES points you can earn.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div>
