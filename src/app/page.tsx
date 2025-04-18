@@ -533,35 +533,26 @@ export default function Home() {
             {activityHistory.length === 0 ? (
                 <p>No activities submitted yet.</p>
             ) : (
-                <Table>
-                    <TableHeader>
-                    <TableRow>
-                        <TableHead>Activity Name</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Points</TableHead>
-                        <TableHead>Non-Discipline</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                <div className="grid gap-4">
                     {activityHistory.map((activity) => (
-                        <TableRow key={activity.id}>
-                            <TableCell>{activity.activityName}</TableCell>
-                            <TableCell>{format(activity.date, "PPP")}</TableCell>
-                            <TableCell>{activity.role}</TableCell>
-                            <TableCell>{activity.points}</TableCell>
-                            <TableCell>{activity.isNonDiscipline ? "Yes" : "No"}</TableCell>
-                            <TableCell className="text-right">
-                                <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button></TableCell>
-                        </TableRow>
+                        <Card key={activity.id}>
+                            <CardHeader>
+                                <CardTitle>{activity.activityName}</CardTitle>
+                                <CardDescription>
+                                    Date: {format(activity.date, "PPP")} | Role: {activity.role} | Points: {activity.points} | Non-Discipline: {activity.isNonDiscipline ? "Yes" : "No"}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button>
+                            </CardContent>
+                        </Card>
                     ))}
-                    </TableBody>
-                </Table>
+                </div>
             )}
         </div>
     </div>
   );
 }
+
 
 
