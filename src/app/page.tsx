@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from 'uuid';
 
 const CES_POINTS_REQUIRED = 60;
 
-const activityPoints = 
-{
-
-};
-
-type ActivityType = keyof typeof activityPoints;
+interface Activity {
+    id: string;
+    activityName: string;
+    date: Date;
+    role: string;
+    points: number;
+}
 
 // Points Matrix Data
 const roleOptions = [
@@ -85,20 +87,44 @@ const initialPointsMatrixState: PointsMatrixState = {
 
 
 export default function Home() {
-  const [cesPoints, setCesPoints] = useState(10);
+  const [cesPoints, setCesPoints] = useState(0);
+  const [disciplinePoints, setDisciplinePoints] = useState(0);
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
   const [proofFiles, setProofFiles] = useState<File[]>([]);
-  const [selectedActivity, setSelectedActivity] = useState<ActivityType>("Volunteering at a local shelter");
-  const [disciplinePoints, setDisciplinePoints] = useState(5);
-
-  // Points Matrix State
+  const [disciplinePointsInput, setDisciplinePointsInput] = useState(0);
   const [pointsMatrix, setPointsMatrix] = useState<PointsMatrixState>(initialPointsMatrixState);
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [titleOfActivity, setTitleOfActivity] = useState("");
+  const [iSawThat, setISawThat] = useState("");
+  const [iHeardThat, setIHeardThat] = useState("");
+  const [withWhatIExperiencedIWill, setWithWhatIExperiencedIWill] = useState("");
+  const [iFeltThat, setIFeltThat] = useState("");
+  const [role, setRole] = useState("");
+  const [iThoughtThat, setIThoughtThat] = useState("");
+  const [overallRating, setOverallRating] = useState("");
+  const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
 
   const nonDisciplinePoints = cesPoints - disciplinePoints;
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
+    useEffect(() => {
+        // Recalculate total points when discipline points input changes
+        setCesPoints(disciplinePoints + nonDisciplinePoints);
+    }, [disciplinePoints]);
+
   const handleActivitySubmit = () => {
+    const newActivity: Activity = {
+      id: uuidv4(),
+      activityName: titleOfActivity,
+      date: selectedDate || new Date(),
+      role: role,
+      points: totalPoints, // Assuming you want to store the calculated points
+    };
+
+    setActivityHistory([...activityHistory, newActivity]);
+    setCesPoints(cesPoints + totalPoints);
+
     // Placeholder for activity submission logic
     console.log("Activity submitted:", {
       activityName,
@@ -112,6 +138,7 @@ export default function Home() {
       iFeltThat,
       iThoughtThat,
       overallRating,
+      points: totalPoints,
     });
     // Reset form fields after submission
     setActivityName("");
@@ -125,6 +152,7 @@ export default function Home() {
     setIFeltThat("");
     setIThoughtThat("");
     setOverallRating("");
+        setRole("");
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -160,17 +188,12 @@ export default function Home() {
     }
   };
 
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [titleOfActivity, setTitleOfActivity] = useState("");
-  const [iSawThat, setISawThat] = useState("");
-  const [iHeardThat, setIHeardThat] = useState("");
-  const [withWhatIExperiencedIWill, setWithWhatIExperiencedIWill] = useState("");
-  const [iFeltThat, setIFeltThat] = useState("");
-  const [role, setRole] = useState("");
-  const [iThoughtThat, setIThoughtThat] = useState("");
-  const [overallRating, setOverallRating] = useState("");
 
   const { toast } = useToast();
+
+    const handleDeleteActivity = (id: string) => {
+        setActivityHistory(activityHistory.filter(activity => activity.id !== id));
+    };
 
   return (
     <div className="container mx-auto p-4">
@@ -194,7 +217,12 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-2">
                 <div>Discipline Pts</div>
-                <div>{disciplinePoints} pts</div>
+                <Input
+                    type="number"
+                    id="disciplinePoints"
+                    value={disciplinePoints}
+                    onChange={(e) => setDisciplinePoints(Number(e.target.value))}
+                />
             </div>
             <div className="flex items-center space-x-2">
                 <div>Total Points</div>
@@ -306,14 +334,14 @@ export default function Home() {
               />
             </div>
 
-            <div>
-              <Label htmlFor="iThoughtThat">The exposure activity made me think that...</Label>
-              <Textarea
-                id="iThoughtThat"
-                value={iThoughtThat}
-                onChange={(e) => setIThoughtThat(e.target.value)}
-              />
-            </div>
+              <div>
+                  <Label htmlFor="iThoughtThat">The exposure activity made me think that...</Label>
+                  <Textarea
+                      id="iThoughtThat"
+                      value={iThoughtThat}
+                      onChange={(e) => setIThoughtThat(e.target.value)}
+                  />
+              </div>
 
             <div>
               <Label htmlFor="iFeltThat">I felt that...</Label>
@@ -448,8 +476,38 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
+
+        <div>
+            <h2>Activity History</h2>
+            {activityHistory.length === 0 ? (
+                <p>No activities submitted yet.</p>
+            ) : (
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Activity Name</th>
+                        <th>Date</th>
+                        <th>Role</th>
+                        <th>Points</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {activityHistory.map((activity) => (
+                        <tr key={activity.id}>
+                            <td>{activity.activityName}</td>
+                            <td>{format(activity.date, "PPP")}</td>
+                            <td>{activity.role}</td>
+                            <td>{activity.points}</td>
+                            <td>
+                                <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
     </div>
   );
 }
-
-
