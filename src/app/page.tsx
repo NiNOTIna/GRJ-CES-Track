@@ -14,8 +14,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from "@/components/ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const CES_POINTS_REQUIRED = 60;
 
@@ -26,6 +26,13 @@ interface Activity {
     role: string;
     points: number;
     isNonDiscipline: boolean;
+    fileUrls: string[]; // Add fileUrls property
+    iSawThat: string;
+    iHeardThat: string;
+    withWhatIExperiencedIWill: string;
+    iFeltThat: string;
+    iThoughtThat: string;
+    overallRating: string;
 }
 
 // Points Matrix Data
@@ -69,20 +76,20 @@ type ScopeValue = "university" | "school" | "departmental" | "personal";
 type ServiceValue = "extra" | "co";
 
 interface PointsMatrixState {
-  role: RoleValue;
-  recipient: RecipientValue;
-  approach: ApproachValue;
-  scope: ScopeValue;
-  service: ServiceValue;
+  role: RoleValue | "";
+  recipient: RecipientValue | "";
+  approach: ApproachValue | "";
+  scope: ScopeValue | "";
+  service: ServiceValue | "";
   hours: number;
 }
 
 const initialPointsMatrixState: PointsMatrixState = {
-  role: "member",
-  recipient: "communities",
-  approach: "transformatory",
-  scope: "university",
-  service: "extra",
+  role: "",
+  recipient: "",
+  approach: "",
+  scope: "",
+  service: "",
   hours: 0,
 };
 
@@ -106,6 +113,7 @@ export default function Home() {
   const [overallRating, setOverallRating] = useState("");
   const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
   const [nonDisciplineActivity, setNonDisciplineActivity] = useState(false);
+  const [nonDisciplinePointsInput, setNonDisciplinePointsInput] = useState(0);
 
   useEffect(() => {
     // Load activity history from local storage on component mount
@@ -139,14 +147,36 @@ export default function Home() {
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
 
-  const handleActivitySubmit = () => {
+  const handleActivitySubmit = async () => {
+      const fileUrls: string[] = [];
+
+        if (proofFiles.length > 0) {
+            for (const file of proofFiles) {
+                // In a real application, you would upload the file to a server or cloud storage
+                // and get a URL. For this example, we'll use a FileReader to read the file
+                // and store it as a data URL.
+
+                const fileUrl = await readFileAsDataURL(file);
+                fileUrls.push(fileUrl);
+            }
+        }
+
+      const points = nonDisciplineActivity ? nonDisciplinePointsInput : totalPoints;
+
       const newActivity: Activity = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         activityName: titleOfActivity,
         date: selectedDate || new Date(),
         role: role,
-        points: totalPoints,
-        isNonDiscipline: nonDisciplineActivity, // Include the isNonDiscipline state
+        points: points,
+        isNonDiscipline: nonDisciplineActivity,
+        fileUrls: fileUrls,
+          iSawThat: iSawThat,
+          iHeardThat: iHeardThat,
+          withWhatIExperiencedIWill: withWhatIExperiencedIWill,
+          iFeltThat: iFeltThat,
+          iThoughtThat: iThoughtThat,
+          overallRating: overallRating,
       };
 
     setActivityHistory([...activityHistory, newActivity]);
@@ -167,6 +197,8 @@ export default function Home() {
       overallRating,
       points: totalPoints,
       isNonDiscipline: nonDisciplineActivity, // Log the value of isNonDiscipline
+      fileUrls: fileUrls,
+        overallRating
     });
     // Reset form fields after submission
     setActivityName("");
@@ -181,7 +213,8 @@ export default function Home() {
     setIThoughtThat("");
     setOverallRating("");
     setRole("");
-        setNonDisciplineActivity(false);
+    setNonDisciplineActivity(false);
+    setNonDisciplinePointsInput(0); // Reset non-discipline points input
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -196,6 +229,11 @@ export default function Home() {
 
 
   const calculateTotalPoints = () => {
+    // Check if any of the select options are empty
+    if (!pointsMatrix.role || !pointsMatrix.recipient || !pointsMatrix.approach || !pointsMatrix.scope || !pointsMatrix.service) {
+      return 0; // Return 0 if any option is not selected
+    }
+
     const rolePoints = roleOptions.find((option) => option.value === pointsMatrix.role)?.points || 0;
     const recipientPoints = recipientOptions.find((option) => option.value === pointsMatrix.recipient)?.points || 0;
     const approachPoints = approachOptions.find((option) => option.value === pointsMatrix.approach)?.points || 0;
@@ -233,6 +271,21 @@ export default function Home() {
             }
         }
         setActivityHistory(activityHistory.filter(activity => activity.id !== id));
+    };
+
+    const readFileAsDataURL = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === 'string') {
+                    resolve(event.target.result);
+                } else {
+                    reject(new Error('Failed to read file as data URL'));
+                }
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
     };
 
 
@@ -343,15 +396,33 @@ export default function Home() {
                 </div>
               )}
 
-            <div>
+              <div className="grid gap-4">
                 <Label htmlFor="nonDiscipline">
                     <Checkbox
                         id="nonDiscipline"
                         checked={nonDisciplineActivity}
-                        onCheckedChange={(checked) => setNonDisciplineActivity(!!checked)}
+                        onCheckedChange={(checked) => {
+                            setNonDisciplineActivity(!!checked);
+                        }}
                     />
                     <span className="pl-2">Non-Discipline Activity</span>
                 </Label>
+
+                {nonDisciplineActivity && (
+                    <div>
+                        <Label htmlFor="nonDisciplinePoints">Add Non-Discipline Points (Max 10):</Label>
+                        <Input
+                            type="number"
+                            id="nonDisciplinePoints"
+                            value={nonDisciplinePointsInput}
+                            onChange={(e) => {
+                                const value = Math.max(0, Math.min(10, parseInt(e.target.value)));
+                                setNonDisciplinePointsInput(isNaN(value) ? 0 : value);
+                            }}
+                            max={10}
+                        />
+                    </div>
+                )}
             </div>
 
 
@@ -428,9 +499,9 @@ export default function Home() {
             <CardDescription>See how many CES points you can earn.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-            <div>
+             <div>
               <Label htmlFor="role">Role</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("role", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("role", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
                 </SelectTrigger>
@@ -446,7 +517,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="recipient">Recipient</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select recipient" currentValue={pointsMatrix.recipient} />
                 </SelectTrigger>
@@ -462,7 +533,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="approach">Approach</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select approach" currentValue={pointsMatrix.approach} />
                 </SelectTrigger>
@@ -478,7 +549,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="scope">Scope</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select scope" currentValue={pointsMatrix.scope} />
                 </SelectTrigger>
@@ -494,7 +565,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="service">Nature of Service</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("service", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("service", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select nature of service" currentValue={pointsMatrix.service} />
                 </SelectTrigger>
@@ -515,6 +586,7 @@ export default function Home() {
                 id="hours"
                 value={pointsMatrix.hours}
                 onChange={(e) => handlePointsMatrixChange("hours", e.target.value)}
+                disabled={nonDisciplineActivity}
               />
             </div>
 
@@ -540,6 +612,29 @@ export default function Home() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
+                                <Accordion type="single" collapsible>
+                                    <AccordionItem value={activity.id}>
+                                        <AccordionTrigger>View Submission Details</AccordionTrigger>
+                                        <AccordionContent>
+                                            <p><strong>I saw that:</strong> {activity.iSawThat}</p>
+                                            <p><strong>I heard that:</strong> {activity.iHeardThat}</p>
+                                            <p><strong>With what I experienced, I will:</strong> {activity.withWhatIExperiencedIWill}</p>
+                                            <p><strong>The exposure activity made me think that:</strong> {activity.iThoughtThat}</p>
+                                            <p><strong>I felt that:</strong> {activity.iFeltThat}</p>
+                                            <p><strong>Overall Rating:</strong> {activity.overallRating}</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                                {activity.fileUrls.length > 0 && (
+                                    <div className="mb-4">
+                                        <p className="font-medium">Uploaded Images:</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {activity.fileUrls.map((url, index) => (
+                                                <img key={index} src={url} alt={`Proof ${index + 1}`} className="max-w-[100px] max-h-[100px] rounded-md" />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                                 <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button>
                             </CardContent>
                         </Card>
