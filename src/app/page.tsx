@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const CES_POINTS_REQUIRED = 60;
 
@@ -26,6 +27,12 @@ interface Activity {
     points: number;
     isNonDiscipline: boolean;
     fileUrls: string[]; // Add fileUrls property
+    iSawThat: string;
+    iHeardThat: string;
+    withWhatIExperiencedIWill: string;
+    iFeltThat: string;
+    iThoughtThat: string;
+    overallRating: string;
 }
 
 // Points Matrix Data
@@ -164,6 +171,12 @@ export default function Home() {
         points: points,
         isNonDiscipline: nonDisciplineActivity,
         fileUrls: fileUrls,
+          iSawThat: iSawThat,
+          iHeardThat: iHeardThat,
+          withWhatIExperiencedIWill: withWhatIExperiencedIWill,
+          iFeltThat: iFeltThat,
+          iThoughtThat: iThoughtThat,
+          overallRating: overallRating,
       };
 
     setActivityHistory([...activityHistory, newActivity]);
@@ -185,6 +198,7 @@ export default function Home() {
       points: totalPoints,
       isNonDiscipline: nonDisciplineActivity, // Log the value of isNonDiscipline
       fileUrls: fileUrls,
+        overallRating
     });
     // Reset form fields after submission
     setActivityName("");
@@ -598,6 +612,19 @@ export default function Home() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
+                                <Accordion type="single" collapsible>
+                                    <AccordionItem value={activity.id}>
+                                        <AccordionTrigger>View Submission Details</AccordionTrigger>
+                                        <AccordionContent>
+                                            <p><strong>I saw that:</strong> {activity.iSawThat}</p>
+                                            <p><strong>I heard that:</strong> {activity.iHeardThat}</p>
+                                            <p><strong>With what I experienced, I will:</strong> {activity.withWhatIExperiencedIWill}</p>
+                                            <p><strong>The exposure activity made me think that:</strong> {activity.iThoughtThat}</p>
+                                            <p><strong>I felt that:</strong> {activity.iFeltThat}</p>
+                                            <p><strong>Overall Rating:</strong> {activity.overallRating}</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
                                 {activity.fileUrls.length > 0 && (
                                     <div className="mb-4">
                                         <p className="font-medium">Uploaded Images:</p>
