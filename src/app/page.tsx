@@ -69,20 +69,20 @@ type ScopeValue = "university" | "school" | "departmental" | "personal";
 type ServiceValue = "extra" | "co";
 
 interface PointsMatrixState {
-  role: RoleValue;
-  recipient: RecipientValue;
-  approach: ApproachValue;
-  scope: ScopeValue;
-  service: ServiceValue;
+  role: RoleValue | "";
+  recipient: RecipientValue | "";
+  approach: ApproachValue | "";
+  scope: ScopeValue | "";
+  service: ServiceValue | "";
   hours: number;
 }
 
 const initialPointsMatrixState: PointsMatrixState = {
-  role: "member",
-  recipient: "communities",
-  approach: "transformatory",
-  scope: "university",
-  service: "extra",
+  role: "",
+  recipient: "",
+  approach: "",
+  scope: "",
+  service: "",
   hours: 0,
 };
 
@@ -215,6 +215,11 @@ export default function Home() {
 
 
   const calculateTotalPoints = () => {
+    // Check if any of the select options are empty
+    if (!pointsMatrix.role || !pointsMatrix.recipient || !pointsMatrix.approach || !pointsMatrix.scope || !pointsMatrix.service) {
+      return 0; // Return 0 if any option is not selected
+    }
+
     const rolePoints = roleOptions.find((option) => option.value === pointsMatrix.role)?.points || 0;
     const recipientPoints = recipientOptions.find((option) => option.value === pointsMatrix.recipient)?.points || 0;
     const approachPoints = approachOptions.find((option) => option.value === pointsMatrix.approach)?.points || 0;
@@ -613,3 +618,4 @@ export default function Home() {
     </div>
   );
 }
+
