@@ -106,6 +106,7 @@ export default function Home() {
   const [overallRating, setOverallRating] = useState("");
   const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
   const [nonDisciplineActivity, setNonDisciplineActivity] = useState(false);
+  const [nonDisciplinePointsInput, setNonDisciplinePointsInput] = useState(0);
 
   useEffect(() => {
     // Load activity history from local storage on component mount
@@ -153,12 +154,14 @@ export default function Home() {
             }
         }
 
+      const points = nonDisciplineActivity ? nonDisciplinePointsInput : totalPoints;
+
       const newActivity: Activity = {
         id: crypto.randomUUID(),
         activityName: titleOfActivity,
         date: selectedDate || new Date(),
         role: role,
-        points: totalPoints,
+        points: points,
         isNonDiscipline: nonDisciplineActivity,
         fileUrls: fileUrls,
       };
@@ -197,6 +200,7 @@ export default function Home() {
     setOverallRating("");
     setRole("");
     setNonDisciplineActivity(false);
+    setNonDisciplinePointsInput(0); // Reset non-discipline points input
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -373,15 +377,33 @@ export default function Home() {
                 </div>
               )}
 
-            <div>
+              <div className="grid gap-4">
                 <Label htmlFor="nonDiscipline">
                     <Checkbox
                         id="nonDiscipline"
                         checked={nonDisciplineActivity}
-                        onCheckedChange={(checked) => setNonDisciplineActivity(!!checked)}
+                        onCheckedChange={(checked) => {
+                            setNonDisciplineActivity(!!checked);
+                        }}
                     />
                     <span className="pl-2">Non-Discipline Activity</span>
                 </Label>
+
+                {nonDisciplineActivity && (
+                    <div>
+                        <Label htmlFor="nonDisciplinePoints">Add Non-Discipline Points (Max 10):</Label>
+                        <Input
+                            type="number"
+                            id="nonDisciplinePoints"
+                            value={nonDisciplinePointsInput}
+                            onChange={(e) => {
+                                const value = Math.max(0, Math.min(10, parseInt(e.target.value)));
+                                setNonDisciplinePointsInput(isNaN(value) ? 0 : value);
+                            }}
+                            max={10}
+                        />
+                    </div>
+                )}
             </div>
 
 
@@ -458,9 +480,9 @@ export default function Home() {
             <CardDescription>Select the options that best describe your activity.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-            <div>
+             <div>
               <Label htmlFor="role">Role</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("role", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("role", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
                 </SelectTrigger>
@@ -476,7 +498,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="recipient">Recipient</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select recipient" currentValue={pointsMatrix.recipient} />
                 </SelectTrigger>
@@ -492,7 +514,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="approach">Approach</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select approach" currentValue={pointsMatrix.approach} />
                 </SelectTrigger>
@@ -508,7 +530,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="scope">Scope</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select scope" currentValue={pointsMatrix.scope} />
                 </SelectTrigger>
@@ -524,7 +546,7 @@ export default function Home() {
 
             <div>
               <Label htmlFor="service">Nature of Service</Label>
-              <Select onValueChange={(value) => handlePointsMatrixChange("service", value)}>
+              <Select onValueChange={(value) => handlePointsMatrixChange("service", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select nature of service" currentValue={pointsMatrix.service} />
                 </SelectTrigger>
@@ -545,6 +567,7 @@ export default function Home() {
                 id="hours"
                 value={pointsMatrix.hours}
                 onChange={(e) => handlePointsMatrixChange("hours", e.target.value)}
+                disabled={nonDisciplineActivity}
               />
             </div>
 
@@ -590,5 +613,3 @@ export default function Home() {
     </div>
   );
 }
-
-
