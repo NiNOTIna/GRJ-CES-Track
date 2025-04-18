@@ -261,7 +261,7 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-2">
                 <div>Discipline Pts</div>
-                  <div>{disciplinePoints} / {CES_POINTS_REQUIRED * 0.7}</div>
+                  <div>{disciplinePoints}</div>
             </div>
             <div className="flex items-center space-x-2">
                 <div>Total Points</div>
