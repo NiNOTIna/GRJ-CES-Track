@@ -245,15 +245,15 @@ export default function Home() {
 
   const totalPoints = calculateTotalPoints();
 
-  const handlePointsMatrixChange = (key: keyof PointsMatrixState, value: string) => {
-    if (key === "hours") {
-      // Parse the value as a number when it's the "hours" field
-      setPointsMatrix((prev) => ({ ...prev, [key]: parseInt(value, 10) || 0 }));
-    } else {
-      // Otherwise, treat it as a string
-      setPointsMatrix((prev) => ({ ...prev, [key]: value }));
-    }
-  };
+    const handlePointsMatrixChange = (key: keyof PointsMatrixState, value: string) => {
+        if (key === "hours") {
+            // Parse the value as a number when it's the "hours" field
+            setPointsMatrix((prev) => ({...prev, [key]: parseInt(value, 10) || 0}));
+        } else {
+            // Otherwise, treat it as a string
+            setPointsMatrix((prev) => ({...prev, [key]: value}));
+        }
+    };
 
 
   const { toast } = useToast();
@@ -287,6 +287,40 @@ export default function Home() {
             reader.readAsDataURL(file);
         });
     };
+
+  const handleExportData = () => {
+    const dataStr = JSON.stringify(activityHistory);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = 'activityData.json';
+
+    let linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    document.body.appendChild(linkElement);
+    linkElement.click();
+    document.body.removeChild(linkElement);
+  }
+
+  const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      alert('No file selected');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      try {
+        const jsonData = JSON.parse(event.target?.result as string);
+        setActivityHistory(jsonData);
+        localStorage.setItem('activityHistory', JSON.stringify(jsonData));
+      } catch (error) {
+        alert('Error parsing JSON');
+      }
+    };
+    reader.readAsText(file);
+  }
 
 
   return (
@@ -596,7 +630,10 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
-
+        <div className="flex mt-4 space-x-2">
+            <Button onClick={handleExportData}>Export Data</Button>
+            <Input type="file" accept=".json" onChange={handleImportData} />
+        </div>
         <div>
             <h2>Activity History</h2>
             {activityHistory.length === 0 ? (
