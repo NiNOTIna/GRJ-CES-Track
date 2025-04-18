@@ -14,7 +14,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from "@/components/ui/checkbox";
 
 const CES_POINTS_REQUIRED = 60;
@@ -26,6 +25,7 @@ interface Activity {
     role: string;
     points: number;
     isNonDiscipline: boolean;
+    fileUrls: string[]; // Add fileUrls property
 }
 
 // Points Matrix Data
@@ -139,14 +139,28 @@ export default function Home() {
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
 
-  const handleActivitySubmit = () => {
+  const handleActivitySubmit = async () => {
+      const fileUrls: string[] = [];
+
+        if (proofFiles.length > 0) {
+            for (const file of proofFiles) {
+                // In a real application, you would upload the file to a server or cloud storage
+                // and get a URL. For this example, we'll use a FileReader to read the file
+                // and store it as a data URL.
+
+                const fileUrl = await readFileAsDataURL(file);
+                fileUrls.push(fileUrl);
+            }
+        }
+
       const newActivity: Activity = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         activityName: titleOfActivity,
         date: selectedDate || new Date(),
         role: role,
         points: totalPoints,
-        isNonDiscipline: nonDisciplineActivity, // Include the isNonDiscipline state
+        isNonDiscipline: nonDisciplineActivity,
+        fileUrls: fileUrls,
       };
 
     setActivityHistory([...activityHistory, newActivity]);
@@ -167,6 +181,7 @@ export default function Home() {
       overallRating,
       points: totalPoints,
       isNonDiscipline: nonDisciplineActivity, // Log the value of isNonDiscipline
+      fileUrls: fileUrls,
     });
     // Reset form fields after submission
     setActivityName("");
@@ -181,7 +196,7 @@ export default function Home() {
     setIThoughtThat("");
     setOverallRating("");
     setRole("");
-        setNonDisciplineActivity(false);
+    setNonDisciplineActivity(false);
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -233,6 +248,21 @@ export default function Home() {
             }
         }
         setActivityHistory(activityHistory.filter(activity => activity.id !== id));
+    };
+
+    const readFileAsDataURL = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === 'string') {
+                    resolve(event.target.result);
+                } else {
+                    reject(new Error('Failed to read file as data URL'));
+                }
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
     };
 
 
@@ -540,6 +570,16 @@ export default function Home() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
+                                {activity.fileUrls.length > 0 && (
+                                    <div className="mb-4">
+                                        <p className="font-medium">Uploaded Images:</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {activity.fileUrls.map((url, index) => (
+                                                <img key={index} src={url} alt={`Proof ${index + 1}`} className="max-w-[100px] max-h-[100px] rounded-md" />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                                 <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button>
                             </CardContent>
                         </Card>
@@ -550,4 +590,5 @@ export default function Home() {
     </div>
   );
 }
+
 
