@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import * as pako from 'pako'; // Import pako library
 
 const CES_POINTS_REQUIRED = 60;
 
@@ -289,17 +290,18 @@ export default function Home() {
     };
 
   const handleExportData = () => {
-    const dataStr = JSON.stringify(activityHistory);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+      const dataStr = JSON.stringify(activityHistory);
+      const compressedData = pako.deflate(dataStr, {to: 'string'});
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(compressedData);
 
-    const exportFileDefaultName = 'activityData.json';
+      const exportFileDefaultName = 'activityData.json';
 
-    let linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    document.body.appendChild(linkElement);
-    linkElement.click();
-    document.body.removeChild(linkElement);
+      let linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      document.body.appendChild(linkElement);
+      linkElement.click();
+      document.body.removeChild(linkElement);
   }
 
   const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -312,11 +314,14 @@ export default function Home() {
     const reader = new FileReader();
     reader.onload = function(event) {
       try {
-        const jsonData = JSON.parse(event.target?.result as string);
+        const compressedData = event.target?.result as string;
+        const dataStr = pako.inflate(compressedData, {to: 'string'});
+        const jsonData = JSON.parse(dataStr);
         setActivityHistory(jsonData);
         localStorage.setItem('activityHistory', JSON.stringify(jsonData));
       } catch (error) {
         alert('Error parsing JSON');
+        console.error(error);
       }
     };
     reader.readAsText(file);
@@ -372,29 +377,29 @@ export default function Home() {
                     />
                 </div>
               <div>
-                <Label htmlFor="date">Date of Activity</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center" side="bottom">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                  <Label htmlFor="date">Date of Activity</Label>
+                  <Popover>
+                      <PopoverTrigger asChild>
+                          <Button
+                              variant={"outline"}
+                              className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !selectedDate && "text-muted-foreground"
+                              )}
+                          >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="center" side="bottom">
+                          <Calendar
+                              mode="single"
+                              selected={selectedDate}
+                              onSelect={setSelectedDate}
+                              initialFocus
+                          />
+                      </PopoverContent>
+                  </Popover>
               </div>
             </div>
 
@@ -683,5 +688,3 @@ export default function Home() {
     </div>
   );
 }
-
-
