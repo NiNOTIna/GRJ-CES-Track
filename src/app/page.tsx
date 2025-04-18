@@ -245,11 +245,28 @@ export default function Home() {
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setProofFiles(Array.from(e.target.files));
-    }
-  };
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+
+            // Check if any file exceeds 5MB
+            const exceedsSizeLimit = files.some(file => file.size > 5 * 1024 * 1024); // 5MB
+
+            if (exceedsSizeLimit) {
+                toast({
+                    variant: 'destructive',
+                    title: 'File size limit exceeded',
+                    description: 'One or more files are larger than 5MB. Please upload smaller files.',
+                });
+                // Clear the file input
+                e.target.value = '';
+                setProofFiles([]);
+                return;
+            }
+
+            setProofFiles(files);
+        }
+    };
 
 
   const calculateTotalPoints = () => {
