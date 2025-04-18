@@ -15,9 +15,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox";
-
 
 const CES_POINTS_REQUIRED = 60;
 
@@ -62,7 +60,6 @@ const serviceOptions = [
   { value: "extra", label: "Extra Curricular", points: 4 },
   { value: "co", label: "Co Curricular", points: 3 },
 ];
-
 
 // Define types for selected options
 type RoleValue = "member" | "speaker" | "leader";
@@ -553,6 +550,4 @@ export default function Home() {
     </div>
   );
 }
-
-
 
