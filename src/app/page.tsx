@@ -415,6 +415,7 @@ export default function Home() {
                         type="file"
                         id="proofUpload"
                         multiple
+                        accept="image/png, image/jpg, image/jpeg, image/webp"
                         onChange={handleFileChange}
                     />
                 </div>
@@ -682,4 +683,5 @@ export default function Home() {
     </div>
   );
 }
+
 
