@@ -120,13 +120,36 @@ export default function Home() {
     // Load activity history from local storage on component mount
     const storedHistory = localStorage.getItem('activityHistory');
     if (storedHistory) {
-      setActivityHistory(JSON.parse(storedHistory));
+      try {
+        const decompressedData = pako.inflate(storedHistory, { to: 'string' });
+        setActivityHistory(JSON.parse(decompressedData));
+      } catch (error) {
+        console.error("Error decompressing or parsing activity history:", error);
+        // Handle the error, e.g., by showing a toast
+        toast({
+          variant: 'destructive',
+          title: 'Error loading activity history',
+          description: 'Could not load previous activities. Data may be corrupted.',
+        });
+        localStorage.removeItem('activityHistory');
+        setActivityHistory([]);
+      }
     }
   }, []);
 
   useEffect(() => {
     // Save activity history to local storage whenever it changes
-    localStorage.setItem('activityHistory', JSON.stringify(activityHistory));
+    try {
+      const compressedData = pako.deflate(JSON.stringify(activityHistory), { to: 'string' });
+      localStorage.setItem('activityHistory', compressedData);
+    } catch (error) {
+      console.error("Error compressing activity history:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Error saving activity history',
+        description: 'Could not save your activities. Please try again.',
+      });
+    }
 
     // Recalculate CES points whenever activity history changes
     let newCesPoints = 0;
