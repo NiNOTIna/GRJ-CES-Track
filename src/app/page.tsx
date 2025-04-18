@@ -553,8 +553,7 @@ export default function Home() {
                             <TableCell>{activity.points}</TableCell>
                             <TableCell>{activity.isNonDiscipline ? "Yes" : "No"}</TableCell>
                             <TableCell className="text-right">
-                                <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button>
-                            </TableCell>
+                                <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button></TableCell>
                         </TableRow>
                     ))}
                     </TableBody>
@@ -564,4 +563,5 @@ export default function Home() {
     </div>
   );
 }
+
 
