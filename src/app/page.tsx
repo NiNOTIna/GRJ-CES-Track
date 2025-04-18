@@ -121,8 +121,8 @@ export default function Home() {
     const storedHistory = localStorage.getItem('activityHistory');
     if (storedHistory) {
       try {
-        const decompressedData = pako.inflate(storedHistory, { to: 'string' });
-        setActivityHistory(JSON.parse(decompressedData));
+        //const decompressedData = pako.inflate(storedHistory, { to: 'string' });
+        setActivityHistory(JSON.parse(storedHistory));
       } catch (error) {
         console.error("Error decompressing or parsing activity history:", error);
         // Handle the error, e.g., by showing a toast
@@ -140,8 +140,8 @@ export default function Home() {
   useEffect(() => {
     // Save activity history to local storage whenever it changes
     try {
-      const compressedData = pako.deflate(JSON.stringify(activityHistory), { to: 'string' });
-      localStorage.setItem('activityHistory', compressedData);
+      //const compressedData = pako.deflate(JSON.stringify(activityHistory), { to: 'string' });
+      localStorage.setItem('activityHistory', JSON.stringify(activityHistory));
     } catch (error) {
       console.error("Error compressing activity history:", error);
       toast({
@@ -314,8 +314,8 @@ export default function Home() {
 
   const handleExportData = () => {
       const dataStr = JSON.stringify(activityHistory);
-      const compressedData = pako.deflate(dataStr, {to: 'string'});
-      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(compressedData);
+      //const compressedData = pako.deflate(dataStr, {to: 'string'});
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
       const exportFileDefaultName = 'activityData.json';
 
@@ -338,8 +338,8 @@ export default function Home() {
     reader.onload = function(event) {
       try {
         const compressedData = event.target?.result as string;
-        const dataStr = pako.inflate(compressedData, {to: 'string'});
-        const jsonData = JSON.parse(dataStr);
+        //const dataStr = pako.inflate(compressedData, {to: 'string'});
+        const jsonData = JSON.parse(compressedData);
         setActivityHistory(jsonData);
         localStorage.setItem('activityHistory', JSON.stringify(jsonData));
       } catch (error) {
