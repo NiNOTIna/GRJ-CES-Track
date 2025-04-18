@@ -15,6 +15,9 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 const CES_POINTS_REQUIRED = 60;
 
@@ -24,6 +27,7 @@ interface Activity {
     date: Date;
     role: string;
     points: number;
+    isNonDiscipline: boolean;
 }
 
 // Points Matrix Data
@@ -104,26 +108,52 @@ export default function Home() {
   const [iThoughtThat, setIThoughtThat] = useState("");
   const [overallRating, setOverallRating] = useState("");
   const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
+  const [nonDisciplineActivity, setNonDisciplineActivity] = useState(false);
+
+  useEffect(() => {
+    // Load activity history from local storage on component mount
+    const storedHistory = localStorage.getItem('activityHistory');
+    if (storedHistory) {
+      setActivityHistory(JSON.parse(storedHistory));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save activity history to local storage whenever it changes
+    localStorage.setItem('activityHistory', JSON.stringify(activityHistory));
+
+    // Recalculate CES points whenever activity history changes
+    let newCesPoints = 0;
+    let newDisciplinePoints = 0;
+
+    activityHistory.forEach(activity => {
+      newCesPoints += activity.points;
+      if (!activity.isNonDiscipline) {
+        newDisciplinePoints += activity.points;
+      }
+    });
+
+    setCesPoints(newCesPoints);
+    setDisciplinePoints(newDisciplinePoints);
+  }, [activityHistory]);
+
 
   const nonDisciplinePoints = cesPoints - disciplinePoints;
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
-    useEffect(() => {
-        // Recalculate total points when discipline points input changes
-        setCesPoints(disciplinePoints + nonDisciplinePoints);
-    }, [disciplinePoints]);
 
   const handleActivitySubmit = () => {
-    const newActivity: Activity = {
-      id: uuidv4(),
-      activityName: titleOfActivity,
-      date: selectedDate || new Date(),
-      role: role,
-      points: totalPoints, // Assuming you want to store the calculated points
-    };
+      const newActivity: Activity = {
+        id: uuidv4(),
+        activityName: titleOfActivity,
+        date: selectedDate || new Date(),
+        role: role,
+        points: totalPoints,
+        isNonDiscipline: nonDisciplineActivity, // Include the isNonDiscipline state
+      };
 
     setActivityHistory([...activityHistory, newActivity]);
-    setCesPoints(cesPoints + totalPoints);
+
 
     // Placeholder for activity submission logic
     console.log("Activity submitted:", {
@@ -139,6 +169,7 @@ export default function Home() {
       iThoughtThat,
       overallRating,
       points: totalPoints,
+      isNonDiscipline: nonDisciplineActivity, // Log the value of isNonDiscipline
     });
     // Reset form fields after submission
     setActivityName("");
@@ -152,7 +183,8 @@ export default function Home() {
     setIFeltThat("");
     setIThoughtThat("");
     setOverallRating("");
-        setRole("");
+    setRole("");
+        setNonDisciplineActivity(false);
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -192,8 +224,20 @@ export default function Home() {
   const { toast } = useToast();
 
     const handleDeleteActivity = (id: string) => {
+        const activityToDelete = activityHistory.find(activity => activity.id === id);
+
+        if (activityToDelete) {
+            // Subtract the points from the total CES points
+            setCesPoints(cesPoints - activityToDelete.points);
+
+            // If it's a discipline activity, also subtract from discipline points
+            if (!activityToDelete.isNonDiscipline) {
+                setDisciplinePoints(disciplinePoints - activityToDelete.points);
+            }
+        }
         setActivityHistory(activityHistory.filter(activity => activity.id !== id));
     };
+
 
   return (
     <div className="container mx-auto p-4">
@@ -217,12 +261,7 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-2">
                 <div>Discipline Pts</div>
-                <Input
-                    type="number"
-                    id="disciplinePoints"
-                    value={disciplinePoints}
-                    onChange={(e) => setDisciplinePoints(Number(e.target.value))}
-                />
+                  <div>{disciplinePoints} / {CES_POINTS_REQUIRED * 0.7}</div>
             </div>
             <div className="flex items-center space-x-2">
                 <div>Total Points</div>
@@ -306,6 +345,18 @@ export default function Home() {
                   </ul>
                 </div>
               )}
+
+            <div>
+                <Label htmlFor="nonDiscipline">
+                    <Checkbox
+                        id="nonDiscipline"
+                        checked={nonDisciplineActivity}
+                        onCheckedChange={(checked) => setNonDisciplineActivity(!!checked)}
+                    />
+                    <span className="pl-2">Non-Discipline Activity</span>
+                </Label>
+            </div>
+
 
             <div>
               <Label htmlFor="iSawThat">I saw that...</Label>
@@ -482,32 +533,35 @@ export default function Home() {
             {activityHistory.length === 0 ? (
                 <p>No activities submitted yet.</p>
             ) : (
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Activity Name</th>
-                        <th>Date</th>
-                        <th>Role</th>
-                        <th>Points</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>Activity Name</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Points</TableHead>
+                        <TableHead>Non-Discipline</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                    </TableHeader>
+                    <TableBody>
                     {activityHistory.map((activity) => (
-                        <tr key={activity.id}>
-                            <td>{activity.activityName}</td>
-                            <td>{format(activity.date, "PPP")}</td>
-                            <td>{activity.role}</td>
-                            <td>{activity.points}</td>
-                            <td>
+                        <TableRow key={activity.id}>
+                            <TableCell>{activity.activityName}</TableCell>
+                            <TableCell>{format(activity.date, "PPP")}</TableCell>
+                            <TableCell>{activity.role}</TableCell>
+                            <TableCell>{activity.points}</TableCell>
+                            <TableCell>{activity.isNonDiscipline ? "Yes" : "No"}</TableCell>
+                            <TableCell className="text-right">
                                 <Button onClick={() => handleDeleteActivity(activity.id)} variant="destructive" size="sm">Delete</Button>
-                            </td>
-                        </tr>
+                            </TableCell>
+                        </TableRow>
                     ))}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
             )}
         </div>
     </div>
   );
 }
+
