@@ -49,6 +49,10 @@ The CES Tracker provides the following advantages:
 - This project is maintained and developed exclusively by student contributors from the 
 University of San Carlos.
 
+  Product Lead - Ghemarson John Nacua
+  Tech Lead - Remy Gabriel Cordero
+  Agile Lead - Justine Ann Catalan
+
 ---
 
 > Note: This project is intended for academic and institutional use only.
