@@ -26,7 +26,7 @@ interface Activity {
     role: string;
     points: number;
     isNonDiscipline: boolean;
-    fileUrls: string[]; // Add fileUrls property
+    fileUrls: string[];
     iSawThat: string;
     iHeardThat: string;
     withWhatIExperiencedIWill: string;
@@ -35,7 +35,7 @@ interface Activity {
     overallRating: string;
 }
 
-// Points Matrix Data
+// CES Points Matrix Data
 const roleOptions = [
   { value: "member", label: "Member/Assistant Volunteer", points: 3 },
   { value: "speaker", label: "Speaker/Facilitator", points: 5 },
@@ -93,14 +93,12 @@ const initialPointsMatrixState: PointsMatrixState = {
   hours: 0,
 };
 
-
 export default function Home() {
   const [cesPoints, setCesPoints] = useState(0);
   const [disciplinePoints, setDisciplinePoints] = useState(0);
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
   const [proofFiles, setProofFiles] = useState<File[]>([]);
-  const [disciplinePointsInput, setDisciplinePointsInput] = useState(0);
   const [pointsMatrix, setPointsMatrix] = useState<PointsMatrixState>(initialPointsMatrixState);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [titleOfActivity, setTitleOfActivity] = useState("");
@@ -158,10 +156,6 @@ export default function Home() {
 
         if (proofFiles.length > 0) {
             for (const file of proofFiles) {
-                // In a real application, you would upload the file to a server or cloud storage
-                // and get a URL. For this example, we'll use a FileReader to read the file
-                // and store it as a data URL.
-
                 const fileUrl = await readFileAsDataURL(file);
                 fileUrls.push(fileUrl);
             }
@@ -187,13 +181,11 @@ export default function Home() {
 
     setActivityHistory([...activityHistory, newActivity]);
 
-
-    // Placeholder for activity submission logic
     console.log("Activity submitted:", {
       activityName,
       activityDescription,
       proofFiles,
-      selectedDate, // Include selectedDate in the submission
+      selectedDate,
       titleOfActivity,
       iSawThat,
       iHeardThat,
@@ -202,11 +194,11 @@ export default function Home() {
       iThoughtThat,
       overallRating,
       points: totalPoints,
-      isNonDiscipline: nonDisciplineActivity, // Log the value of isNonDiscipline
+      isNonDiscipline: nonDisciplineActivity,
       fileUrls: fileUrls,
         overallRating
     });
-    // Reset form fields after submission
+    
     setActivityName("");
     setActivityDescription("");
     setProofFiles([]);
@@ -220,7 +212,7 @@ export default function Home() {
     setOverallRating("");
     setRole("");
     setNonDisciplineActivity(false);
-    setNonDisciplinePointsInput(0); // Reset non-discipline points input
+    setNonDisciplinePointsInput(0);
     toast({
       title: "Activity submitted!",
       description: "Your activity has been submitted for review.",
@@ -235,7 +227,7 @@ export default function Home() {
 
 
   const calculateTotalPoints = () => {
-    // Check if any of the select options are empty
+    
     if (!pointsMatrix.role || !pointsMatrix.recipient || !pointsMatrix.approach || !pointsMatrix.scope || !pointsMatrix.service) {
       return 0; // Return 0 if any option is not selected
     }
@@ -252,15 +244,15 @@ export default function Home() {
   const totalPoints = calculateTotalPoints();
 
     const handlePointsMatrixChange = (key: keyof PointsMatrixState, value: string) => {
-        if (key === "hours") {
-            // Parse the value as a number when it's the "hours" field
+        if (key === "hours") 
+          {
             setPointsMatrix((prev) => ({...prev, [key]: parseInt(value, 10) || 0}));
-        } else {
-            // Otherwise, treat it as a string
+          } 
+        else 
+          {
             setPointsMatrix((prev) => ({...prev, [key]: value}));
-        }
+          }
     };
-
 
   const { toast } = useToast();
 
@@ -327,7 +319,6 @@ export default function Home() {
     };
     reader.readAsText(file);
   }
-
 
   return (
     <div className="container mx-auto p-4">
@@ -465,7 +456,6 @@ export default function Home() {
                     </div>
                 )}
             </div>
-
 
             <div>
               <Label htmlFor="iSawThat">I saw that...</Label>
@@ -689,5 +679,3 @@ export default function Home() {
     </div>
   );
 }
-
-
