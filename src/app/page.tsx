@@ -93,6 +93,7 @@ const initialPointsMatrixState: PointsMatrixState = {
   hours: 0,
 };
 
+// Interface Management
 export default function Home() {
   const [cesPoints, setCesPoints] = useState(0);
   const [disciplinePoints, setDisciplinePoints] = useState(0);
@@ -113,6 +114,7 @@ export default function Home() {
   const [nonDisciplineActivity, setNonDisciplineActivity] = useState(false);
   const [nonDisciplinePointsInput, setNonDisciplinePointsInput] = useState(0);
 
+  // Data Access
   useEffect(() => {
     const storedHistory = localStorage.getItem('activityHistory');
   
@@ -150,7 +152,7 @@ export default function Home() {
   const nonDisciplinePoints = cesPoints - disciplinePoints;
   const progress = (cesPoints / CES_POINTS_REQUIRED) * 100;
 
-
+  // App Logic
   const handleActivitySubmit = async () => {
       const fileUrls: string[] = [];
 
@@ -196,7 +198,6 @@ export default function Home() {
       points: totalPoints,
       isNonDiscipline: nonDisciplineActivity,
       fileUrls: fileUrls,
-        overallRating
     });
     
     setActivityName("");
@@ -320,6 +321,7 @@ export default function Home() {
     reader.readAsText(file);
   }
 
+  // User Interface
   return (
     <div className="container mx-auto p-4">
       <Card className="mb-4">
@@ -506,7 +508,7 @@ export default function Home() {
               <Label htmlFor="overallRating">What is your overall rating to the CES Exposure Activity?</Label>
               <Select onValueChange={(value) => setOverallRating(value)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select rating" currentValue={overallRating} />
+                  <SelectValue placeholder="Select rating" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Angry">Angry</SelectItem>
@@ -534,7 +536,7 @@ export default function Home() {
               <Label htmlFor="role">Role</Label>
               <Select onValueChange={(value) => handlePointsMatrixChange("role", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Select role" currentValue={pointsMatrix.role} />
+                  <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
                   {roleOptions.map((option) => (
@@ -550,7 +552,7 @@ export default function Home() {
               <Label htmlFor="recipient">Recipient</Label>
               <Select onValueChange={(value) => handlePointsMatrixChange("recipient", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Select recipient" currentValue={pointsMatrix.recipient} />
+                  <SelectValue placeholder="Select recipient" />
                 </SelectTrigger>
                 <SelectContent>
                   {recipientOptions.map((option) => (
@@ -566,7 +568,7 @@ export default function Home() {
               <Label htmlFor="approach">Approach</Label>
               <Select onValueChange={(value) => handlePointsMatrixChange("approach", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Select approach" currentValue={pointsMatrix.approach} />
+                  <SelectValue placeholder="Select approach" />
                 </SelectTrigger>
                 <SelectContent>
                   {approachOptions.map((option) => (
@@ -582,7 +584,7 @@ export default function Home() {
               <Label htmlFor="scope">Scope</Label>
               <Select onValueChange={(value) => handlePointsMatrixChange("scope", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Select scope" currentValue={pointsMatrix.scope} />
+                  <SelectValue placeholder="Select scope" />
                 </SelectTrigger>
                 <SelectContent>
                   {scopeOptions.map((option) => (
@@ -598,7 +600,7 @@ export default function Home() {
               <Label htmlFor="service">Nature of Service</Label>
               <Select onValueChange={(value) => handlePointsMatrixChange("service", value)} disabled={nonDisciplineActivity}>
                 <SelectTrigger className="w-[280px]">
-                  <SelectValue placeholder="Select nature of service" currentValue={pointsMatrix.service} />
+                  <SelectValue placeholder="Select nature of service" />
                 </SelectTrigger>
                 <SelectContent>
                   {serviceOptions.map((option) => (
